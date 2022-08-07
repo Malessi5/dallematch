@@ -3,55 +3,53 @@ import React, {useState, useEffect} from "react";
 export default function Card(props) {
   const {
     image,
-    name,
-    id,
     back,
     selected,
     setSelected,
-    deckSize,
-    cardState,
-    setCardState,
+    cards,
+    setCards,
     idx,
     flipUnmatched,
+    checkMatch,
+    card,
+    checkWin,
+    tries,
+    setTries,
   } = props;
 
-  // const [flipped, setFlip] = useState(false);
-  // const [matched, setMatched] = useState(false);
-
   function clickHandle() {
-    if (!cardState[idx].matched) {
-      flipCard(idx, cardState);
-      console.log("selected", selected);
-      if (selected) {
-        let matchedId = Math.abs(id - deckSize);
+    if (!card.matched && !card.flipped) {
+      let select = selected;
 
-        if (selected === matchedId) {
-          const newState = [...cardState];
-          newState[idx].matched = true;
-          newState[selected].matched = true;
-          setCardState(newState);
-          setSelected(0);
-          console.log("matched");
-        } else {
-          setSelected(0);
-        }
-      } else {
-        flipUnmatched(cardState, idx);
-        setSelected(idx);
+      if (select.length === 2) {
+        flipUnmatched();
+        select = [];
       }
+
+      if (select.length === 1) {
+        select.push(idx);
+        setTries(tries + 1);
+        checkMatch(select);
+      } else {
+        select.push(idx);
+      }
+
+      setSelected(select);
+      flipCard();
+      checkWin();
     }
   }
 
-  function flipCard(cardInd, cState) {
-    const newState = [...cState];
-    newState[cardInd].flipped = !newState[cardInd].flipped;
-    setCardState(newState);
+  function flipCard() {
+    let updateCards = [...cards];
+    updateCards[idx].flipped = !updateCards[idx].flipped;
+    setCards(updateCards);
   }
 
   return (
     <div className='card' style={{width: "10em"}} onClick={clickHandle}>
       {" "}
-      {cardState[idx].flipped ? <img src={image} /> : <img src={back} />}
+      {card.flipped ? <img src={image} /> : <img src={back} />}
     </div>
   );
 }
